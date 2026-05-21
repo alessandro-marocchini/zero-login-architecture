@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zero-Login Architecture — Alessandro Marocchini</title>
   <meta name="description" content="Why We Built the Travelguidehub React Native App Without User Accounts">
   <meta property="og:title" content="The Zero-Login Architecture">
-  <meta property="og:description" content="How we removed user registration from Travelguidehub using Device-Bound Identity: SHA-256 salted hash, zero PII, GDPR by design.">
+  <meta property="og:description"
+    content="How we removed user registration from Travelguidehub using Device-Bound Identity: SHA-256 salted hash, zero PII, GDPR by design.">
   <meta property="og:image" content="cover.svg">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary_large_image">
@@ -15,24 +17,30 @@
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
 
     :root {
-      --bg:          #0d0d0d;
-      --surface:     #141414;
-      --surface-2:   #1c1c1c;
-      --border:      #2a2a2a;
-      --border-light:#222;
-      --accent:      #c8f060;
-      --accent-dim:  rgba(200,240,96,0.12);
-      --accent-dim2: rgba(200,240,96,0.06);
-      --text:        #e8e8e0;
-      --text-muted:  #888;
-      --text-dim:    #555;
-      --code-bg:     #111;
-      --high:        #c8f060;
-      --mid:         #60c8f0;
-      --low:         #f09060;
+      --bg: #0d0d0d;
+      --surface: #141414;
+      --surface-2: #1c1c1c;
+      --border: #2a2a2a;
+      --border-light: #222;
+      --accent: #c8f060;
+      --accent-dim: rgba(200, 240, 96, 0.12);
+      --accent-dim2: rgba(200, 240, 96, 0.06);
+      --text: #e8e8e0;
+      --text-muted: #888;
+      --text-dim: #555;
+      --code-bg: #111;
+      --high: #c8f060;
+      --mid: #60c8f0;
+      --low: #f09060;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       background: var(--bg);
@@ -46,9 +54,11 @@
     /* ── NAV ── */
     nav {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 52px;
-      background: rgba(13,13,13,0.92);
+      background: rgba(13, 13, 13, 0.92);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -57,6 +67,7 @@
       padding: 0 2rem;
       z-index: 100;
     }
+
     .nav-logo {
       font-family: 'DM Mono', monospace;
       font-size: 0.75rem;
@@ -65,7 +76,13 @@
       letter-spacing: 0.08em;
       text-decoration: none;
     }
-    .nav-links { display: flex; gap: 2rem; list-style: none; }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
     .nav-links a {
       font-family: 'DM Mono', monospace;
       font-size: 0.7rem;
@@ -75,17 +92,36 @@
       letter-spacing: 0.06em;
       transition: color 0.15s;
     }
-    .nav-links a:hover { color: var(--accent); }
-    @media (max-width: 640px) { .nav-links { display: none; } }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+      }
+    }
 
     /* ── LAYOUT ── */
-    .container { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
 
-    section { padding: 4rem 0; }
-    section + section { border-top: 1px solid var(--border-light); }
+    section {
+      padding: 4rem 0;
+    }
+
+    section+section {
+      border-top: 1px solid var(--border-light);
+    }
 
     /* ── HERO ── */
-    #hero { padding: 9rem 0 5rem; }
+    #hero {
+      padding: 9rem 0 5rem;
+    }
 
     .hero-label {
       font-family: 'DM Mono', monospace;
@@ -98,10 +134,12 @@
       align-items: center;
       gap: 0.75rem;
     }
+
     .hero-label::before {
       content: '';
       display: inline-block;
-      width: 32px; height: 1px;
+      width: 32px;
+      height: 1px;
       background: var(--accent);
     }
 
@@ -112,7 +150,11 @@
       color: var(--text);
       margin-bottom: 1.5rem;
     }
-    h1 em { font-style: italic; color: var(--accent); }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
 
     .hero-sub {
       font-size: 1.1rem;
@@ -122,8 +164,18 @@
       margin-bottom: 2.5rem;
     }
 
-    .hero-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; }
-    .hero-meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .hero-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
     .hero-meta-label {
       font-family: 'DM Mono', monospace;
       font-size: 0.6rem;
@@ -131,6 +183,7 @@
       text-transform: uppercase;
       letter-spacing: 0.1em;
     }
+
     .hero-meta-value {
       font-family: 'DM Mono', monospace;
       font-size: 0.75rem;
@@ -146,6 +199,7 @@
       letter-spacing: 0.12em;
       margin-bottom: 1rem;
     }
+
     h2 {
       font-family: 'Instrument Serif', serif;
       font-size: clamp(1.6rem, 3vw, 2.2rem);
@@ -153,6 +207,7 @@
       color: var(--text);
       margin-bottom: 1.5rem;
     }
+
     h3 {
       font-family: 'DM Mono', monospace;
       font-size: 0.8rem;
@@ -161,9 +216,20 @@
       letter-spacing: 0.08em;
       margin: 2rem 0 0.75rem;
     }
-    p { color: var(--text-muted); margin-bottom: 1rem; }
-    strong { color: var(--text); font-weight: 500; }
-    em { font-style: italic; }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    em {
+      font-style: italic;
+    }
 
     /* ── STATS ROW ── */
     .stats-row {
@@ -175,7 +241,12 @@
       overflow: hidden;
       margin: 2rem 0;
     }
-    .stat-box { background: var(--surface); padding: 1.5rem; }
+
+    .stat-box {
+      background: var(--surface);
+      padding: 1.5rem;
+    }
+
     .stat-highlight {
       font-family: 'Instrument Serif', serif;
       font-size: clamp(2.2rem, 4vw, 3.5rem);
@@ -183,6 +254,7 @@
       line-height: 1;
       margin-bottom: 0.3rem;
     }
+
     .stat-label {
       font-family: 'DM Mono', monospace;
       font-size: 0.65rem;
@@ -201,11 +273,17 @@
       overflow: hidden;
       margin: 2rem 0;
     }
-    .compare-box { background: var(--surface); padding: 1.5rem; }
+
+    .compare-box {
+      background: var(--surface);
+      padding: 1.5rem;
+    }
+
     .compare-box.highlight {
       background: var(--accent-dim2);
-      border: 1px solid rgba(200,240,96,0.2);
+      border: 1px solid rgba(200, 240, 96, 0.2);
     }
+
     .compare-label {
       font-family: 'DM Mono', monospace;
       font-size: 0.65rem;
@@ -213,9 +291,20 @@
       letter-spacing: 0.1em;
       margin-bottom: 1rem;
     }
-    .compare-label.bad  { color: var(--low); }
-    .compare-label.good { color: var(--high); }
-    .compare-box ul { list-style: none; padding: 0; }
+
+    .compare-label.bad {
+      color: var(--low);
+    }
+
+    .compare-label.good {
+      color: var(--high);
+    }
+
+    .compare-box ul {
+      list-style: none;
+      padding: 0;
+    }
+
     .compare-box li {
       font-size: 0.9rem;
       color: var(--text-muted);
@@ -225,16 +314,33 @@
       align-items: flex-start;
       gap: 0.6rem;
     }
-    .compare-box li:last-child { border-bottom: none; }
+
+    .compare-box li:last-child {
+      border-bottom: none;
+    }
+
     .compare-box li::before {
       font-family: 'DM Mono', monospace;
       font-size: 0.7rem;
       flex-shrink: 0;
       margin-top: 0.1rem;
     }
-    .compare-box.bad li::before  { content: '✕'; color: var(--low); }
-    .compare-box.good li::before { content: '→'; color: var(--high); }
-    @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+
+    .compare-box.bad li::before {
+      content: '✕';
+      color: var(--low);
+    }
+
+    .compare-box.good li::before {
+      content: '→';
+      color: var(--high);
+    }
+
+    @media (max-width: 600px) {
+      .compare {
+        grid-template-columns: 1fr;
+      }
+    }
 
     /* ── FLOW STEPS ── */
     .flow {
@@ -243,24 +349,30 @@
       margin: 2rem 0;
       position: relative;
     }
+
     .flow::before {
       content: '';
       position: absolute;
-      left: 17px; top: 24px; bottom: 24px;
+      left: 17px;
+      top: 24px;
+      bottom: 24px;
       width: 1px;
       background: var(--border);
     }
+
     .flow-step {
       display: flex;
       gap: 1.25rem;
       align-items: flex-start;
       padding: 1rem 0;
     }
+
     .flow-num {
-      width: 36px; height: 36px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: var(--accent-dim);
-      border: 1px solid rgba(200,240,96,0.3);
+      border: 1px solid rgba(200, 240, 96, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -271,7 +383,12 @@
       position: relative;
       z-index: 1;
     }
-    .flow-content { padding-top: 0.4rem; flex: 1; }
+
+    .flow-content {
+      padding-top: 0.4rem;
+      flex: 1;
+    }
+
     .flow-title {
       font-family: 'DM Mono', monospace;
       font-size: 0.75rem;
@@ -280,7 +397,12 @@
       letter-spacing: 0.06em;
       margin-bottom: 0.3rem;
     }
-    .flow-desc { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+
+    .flow-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
 
     /* ── CALLOUT ── */
     .callout {
@@ -290,6 +412,7 @@
       padding: 1rem 1.25rem;
       margin: 1.5rem 0;
     }
+
     .callout-title {
       font-family: 'DM Mono', monospace;
       font-size: 0.7rem;
@@ -298,9 +421,20 @@
       letter-spacing: 0.08em;
       margin-bottom: 0.5rem;
     }
-    .callout p { font-size: 0.9rem; margin: 0; }
-    .callout-warn { border-color: var(--low); background: rgba(240,144,96,0.05); }
-    .callout-warn .callout-title { color: var(--low); }
+
+    .callout p {
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .callout-warn {
+      border-color: var(--low);
+      background: rgba(240, 144, 96, 0.05);
+    }
+
+    .callout-warn .callout-title {
+      color: var(--low);
+    }
 
     /* ── TIER TABLE ── */
     .tier-grid {
@@ -311,19 +445,28 @@
       overflow: hidden;
       margin: 2rem 0;
     }
+
     .tier-row {
       display: grid;
       grid-template-columns: 160px 1fr 1fr;
       background: var(--surface);
     }
-    .tier-row.header { background: var(--surface-2); }
+
+    .tier-row.header {
+      background: var(--surface-2);
+    }
+
     .tier-cell {
       padding: 0.75rem 1rem;
       font-size: 0.85rem;
       color: var(--text-muted);
       border-right: 1px solid var(--border);
     }
-    .tier-cell:last-child { border-right: none; }
+
+    .tier-cell:last-child {
+      border-right: none;
+    }
+
     .tier-row.header .tier-cell {
       font-family: 'DM Mono', monospace;
       font-size: 0.65rem;
@@ -331,11 +474,24 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
-    .tier-cell strong { color: var(--text); }
+
+    .tier-cell strong {
+      color: var(--text);
+    }
+
     @media (max-width: 640px) {
-      .tier-row { grid-template-columns: 1fr; }
-      .tier-cell { border-right: none; border-bottom: 1px solid var(--border); }
-      .tier-cell:last-child { border-bottom: none; }
+      .tier-row {
+        grid-template-columns: 1fr;
+      }
+
+      .tier-cell {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .tier-cell:last-child {
+        border-bottom: none;
+      }
     }
 
     /* ── CODE ── */
@@ -350,6 +506,7 @@
       font-size: 0.8rem;
       line-height: 1.6;
     }
+
     code {
       font-family: 'DM Mono', monospace;
       font-size: 0.85em;
@@ -358,11 +515,28 @@
       border-radius: 3px;
       color: var(--text);
     }
-    pre code { background: none; padding: 0; font-size: inherit; }
-    .cm { color: var(--text-dim); }
-    .ck { color: var(--accent); }
-    .cv { color: var(--text-muted); }
-    .cv-high { color: var(--high); }
+
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    .cm {
+      color: var(--text-dim);
+    }
+
+    .ck {
+      color: var(--accent);
+    }
+
+    .cv {
+      color: var(--text-muted);
+    }
+
+    .cv-high {
+      color: var(--high);
+    }
 
     /* ── FAQ ── */
     .faq-item {
@@ -372,6 +546,7 @@
       margin-bottom: 1rem;
       background: var(--surface);
     }
+
     .faq-q {
       font-family: 'DM Mono', monospace;
       font-size: 0.75rem;
@@ -380,7 +555,12 @@
       letter-spacing: 0.05em;
       margin-bottom: 0.6rem;
     }
-    .faq-a { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+
+    .faq-a {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
 
     /* ── AUTHOR BLOCK ── */
     .author-block {
@@ -393,11 +573,13 @@
       align-items: flex-start;
       margin: 1.5rem 0;
     }
+
     .author-avatar {
-      width: 48px; height: 48px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       background: var(--accent-dim);
-      border: 1px solid rgba(200,240,96,0.3);
+      border: 1px solid rgba(200, 240, 96, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -406,6 +588,7 @@
       color: var(--accent);
       flex-shrink: 0;
     }
+
     .author-name {
       font-family: 'DM Mono', monospace;
       font-size: 0.75rem;
@@ -414,14 +597,20 @@
       letter-spacing: 0.08em;
       margin-bottom: 0.4rem;
     }
-    .author-bio { font-size: 0.875rem; color: var(--text-muted); margin: 0 0 0.6rem; }
+
+    .author-bio {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin: 0 0 0.6rem;
+    }
+
     .author-project {
       display: inline-block;
       font-family: 'DM Mono', monospace;
       font-size: 0.65rem;
       color: var(--accent);
       background: var(--accent-dim);
-      border: 1px solid rgba(200,240,96,0.2);
+      border: 1px solid rgba(200, 240, 96, 0.2);
       padding: 0.2em 0.6em;
       border-radius: 3px;
       text-transform: uppercase;
@@ -430,7 +619,12 @@
     }
 
     /* ── FOOTER ── */
-    footer { border-top: 1px solid var(--border); padding: 2rem 0; margin-top: 2rem; }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      margin-top: 2rem;
+    }
+
     .footer-inner {
       display: flex;
       justify-content: space-between;
@@ -438,6 +632,7 @@
       flex-wrap: wrap;
       gap: 1rem;
     }
+
     .footer-text {
       font-family: 'DM Mono', monospace;
       font-size: 0.65rem;
@@ -445,6 +640,7 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
+
     .footer-link {
       font-family: 'DM Mono', monospace;
       font-size: 0.65rem;
@@ -454,193 +650,194 @@
       letter-spacing: 0.08em;
       transition: color 0.15s;
     }
-    .footer-link:hover { color: var(--accent); }
+
+    .footer-link:hover {
+      color: var(--accent);
+    }
   </style>
 </head>
+
 <body>
 
-<nav>
-  <a href="#hero" class="nav-logo">Zero-Login Arch</a>
-  <!-- cover handled below -->
-  <ul class="nav-links">
-    <li><a href="#why">Why</a></li>
-    <li><a href="#architecture">Architecture</a></li>
-    <li><a href="#security">Security</a></li>
-    <li><a href="#tradeoffs">Trade-offs</a></li>
-    <li><a href="#author">Author</a></li>
-  </ul>
-</nav>
+  <nav>
+    <a href="#hero" class="nav-logo">Zero-Login Arch</a>
+    <!-- cover handled below -->
+    <ul class="nav-links">
+      <li><a href="#why">Why</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#tradeoffs">Trade-offs</a></li>
+      <li><a href="#author">Author</a></li>
+    </ul>
+  </nav>
 
-<img
-  src="cover.svg"
-  alt="The Zero-Login Architecture — cover"
-  style="display:block;width:100%;max-height:420px;object-fit:cover;margin-top:52px;border-bottom:1px solid #2a2a2a;"
->
+  <img src="cover.jpg" alt="The Zero-Login Architecture — cover"
+    style="display:block;width:100%;max-height:420px;object-fit:cover;margin-top:52px;border-bottom:1px solid #2a2a2a;">
 
-<div class="container">
+  <div class="container">
 
-  <!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
-  <section id="hero">
-    <div class="hero-label">Architecture Pattern</div>
-    <h1>The Zero-Login<br><em>Architecture</em></h1>
-    <p class="hero-sub">
-      Why we built Travelguidehub — a React Native travel guide — without user accounts,
-      and why you should consider this pattern for your next project.
-    </p>
-    <div class="hero-meta">
-      <div class="hero-meta-item">
-        <span class="hero-meta-label">Author</span>
-        <span class="hero-meta-value">Alessandro Marocchini</span>
-      </div>
-      <div class="hero-meta-item">
-        <span class="hero-meta-label">Project</span>
-        <span class="hero-meta-value">Travelguidehub</span>
-      </div>
-      <div class="hero-meta-item">
-        <span class="hero-meta-label">Published</span>
-        <span class="hero-meta-value">2026-05-21</span>
-      </div>
-      <div class="hero-meta-item">
-        <span class="hero-meta-label">Stack</span>
-        <span class="hero-meta-value">React Native / Node.js</span>
-      </div>
-      <div class="hero-meta-item">
-        <span class="hero-meta-label">Pattern</span>
-        <span class="hero-meta-value">Device-Bound Identity</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════ 01 — WHY ═══════════════════════════ -->
-  <section id="why">
-    <div class="section-label">01 — Business Case</div>
-    <h2>Why Zero-Login?</h2>
-    <p>
-      In the mobile app ecosystem, friction is the enemy of adoption. You download an app,
-      open it with intent, and immediately hit a wall: a mandatory registration or login screen.
-    </p>
-    <p>
-      For Travelguidehub, we made a radical architectural decision and
-      <strong>removed the traditional user registration flow entirely.</strong>
-      Below are the numbers that drove that call.
-    </p>
-
-    <div class="stats-row">
-      <div class="stat-box">
-        <div class="stat-highlight">8.4%</div>
-        <div class="stat-label">Avg. onboarding completion rate</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-highlight">≈ 0%</div>
-        <div class="stat-label">Our drop-off at first open</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-highlight">TTFV</div>
-        <div class="stat-label">Immediate Time-to-First-Value</div>
-      </div>
-    </div>
-
-    <div class="callout callout-warn">
-      <div class="callout-title">The Onboarding Crisis</div>
-      <p>
-        According to recent industry data, a significant portion of users abandon an app due to
-        identity-verification friction — before they ever reach the core feature they came for.
+    <!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+    <section id="hero">
+      <div class="hero-label">Architecture Pattern</div>
+      <h1>The Zero-Login<br><em>Architecture</em></h1>
+      <p class="hero-sub">
+        Why we built Travelguidehub — a React Native travel guide — without user accounts,
+        and why you should consider this pattern for your next project.
       </p>
-    </div>
-
-    <p>
-      In a travel context, a user might download the app while already roaming in a new city.
-      They need immediate utility. Every screen between "download" and "value delivered"
-      is a potential exit point.
-    </p>
-
-    <div class="compare">
-      <div class="compare-box bad">
-        <div class="compare-label bad">Traditional Login Flow</div>
-        <ul>
-          <li>Download</li>
-          <li>Open app</li>
-          <li>Registration wall</li>
-          <li>Verify email / SMS OTP</li>
-          <li>Explore content</li>
-        </ul>
-      </div>
-      <div class="compare-box highlight good">
-        <div class="compare-label good">Zero-Login Flow</div>
-        <ul>
-          <li>Download</li>
-          <li>Open app</li>
-          <li>Explore content</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════ 02 — ARCHITECTURE ═══════════════════════ -->
-  <section id="architecture">
-    <div class="section-label">02 — Implementation</div>
-    <h2>The Device-Bound Identity</h2>
-    <p>
-      To ensure complete privacy and compliance, we designed identity generation to be
-      <strong>volatile upon uninstallation</strong>. We do not track physical hardware
-      indefinitely — only for the lifecycle of a single app installation.
-    </p>
-
-    <h3>Identity Generation Flow</h3>
-    <div class="flow">
-      <div class="flow-step">
-        <div class="flow-num">01</div>
-        <div class="flow-content">
-          <div class="flow-title">Retrieve OS ID</div>
-          <p class="flow-desc">
-            Use <code>react-native-device-info</code> to fetch the OS-provided unique identifier —
-            <code>ANDROID_ID</code> on Android, <code>identifierForVendor</code> on iOS.
-          </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Author</span>
+          <span class="hero-meta-value">Alessandro Marocchini</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Project</span>
+          <span class="hero-meta-value">Travelguidehub</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Published</span>
+          <span class="hero-meta-value">2026-05-21</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Stack</span>
+          <span class="hero-meta-value">React Native / Node.js</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Pattern</span>
+          <span class="hero-meta-value">Device-Bound Identity</span>
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-num">02</div>
-        <div class="flow-content">
-          <div class="flow-title">Salt with Timestamp</div>
-          <p class="flow-desc">
-            Concatenate the device ID with <code>Date.now()</code>. This binds the identity
-            to the installation moment, not permanently to the hardware.
-          </p>
-        </div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-num">03</div>
-        <div class="flow-content">
-          <div class="flow-title">SHA-256 Hash — 16 chars</div>
-          <p class="flow-desc">
-            Compute a SHA-256 hash of the combined string and extract the first 16 characters.
-            The result is an opaque, irreversible identifier with zero PII.
-          </p>
-        </div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-num">04</div>
-        <div class="flow-content">
-          <div class="flow-title">Generate Anonymous Display Name</div>
-          <p class="flow-desc">
-            Auto-generate a randomized display name (e.g. <em>"Curioso Misterioso 452"</em>)
-            for public interactions like posting reviews.
-          </p>
-        </div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-num">05</div>
-        <div class="flow-content">
-          <div class="flow-title">Persist to AsyncStorage</div>
-          <p class="flow-desc">
-            Serialize the identity payload locally. On every subsequent launch the app loads
-            the <code>hashedId</code> and passes it as the <code>user-id</code> header to the backend API.
-          </p>
-        </div>
-      </div>
-    </div>
+    </section>
 
-    <pre><code><span class="cm">// First-launch identity generation</span>
+    <!-- ═══════════════════════════════ 01 — WHY ═══════════════════════════ -->
+    <section id="why">
+      <div class="section-label">01 — Business Case</div>
+      <h2>Why Zero-Login?</h2>
+      <p>
+        In the mobile app ecosystem, friction is the enemy of adoption. You download an app,
+        open it with intent, and immediately hit a wall: a mandatory registration or login screen.
+      </p>
+      <p>
+        For Travelguidehub, we made a radical architectural decision and
+        <strong>removed the traditional user registration flow entirely.</strong>
+        Below are the numbers that drove that call.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-highlight">8.4%</div>
+          <div class="stat-label">Avg. onboarding completion rate</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-highlight">≈ 0%</div>
+          <div class="stat-label">Our drop-off at first open</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-highlight">TTFV</div>
+          <div class="stat-label">Immediate Time-to-First-Value</div>
+        </div>
+      </div>
+
+      <div class="callout callout-warn">
+        <div class="callout-title">The Onboarding Crisis</div>
+        <p>
+          According to recent industry data, a significant portion of users abandon an app due to
+          identity-verification friction — before they ever reach the core feature they came for.
+        </p>
+      </div>
+
+      <p>
+        In a travel context, a user might download the app while already roaming in a new city.
+        They need immediate utility. Every screen between "download" and "value delivered"
+        is a potential exit point.
+      </p>
+
+      <div class="compare">
+        <div class="compare-box bad">
+          <div class="compare-label bad">Traditional Login Flow</div>
+          <ul>
+            <li>Download</li>
+            <li>Open app</li>
+            <li>Registration wall</li>
+            <li>Verify email / SMS OTP</li>
+            <li>Explore content</li>
+          </ul>
+        </div>
+        <div class="compare-box highlight good">
+          <div class="compare-label good">Zero-Login Flow</div>
+          <ul>
+            <li>Download</li>
+            <li>Open app</li>
+            <li>Explore content</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ 02 — ARCHITECTURE ═══════════════════════ -->
+    <section id="architecture">
+      <div class="section-label">02 — Implementation</div>
+      <h2>The Device-Bound Identity</h2>
+      <p>
+        To ensure complete privacy and compliance, we designed identity generation to be
+        <strong>volatile upon uninstallation</strong>. We do not track physical hardware
+        indefinitely — only for the lifecycle of a single app installation.
+      </p>
+
+      <h3>Identity Generation Flow</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-num">01</div>
+          <div class="flow-content">
+            <div class="flow-title">Retrieve OS ID</div>
+            <p class="flow-desc">
+              Use <code>react-native-device-info</code> to fetch the OS-provided unique identifier —
+              <code>ANDROID_ID</code> on Android, <code>identifierForVendor</code> on iOS.
+            </p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">02</div>
+          <div class="flow-content">
+            <div class="flow-title">Salt with Timestamp</div>
+            <p class="flow-desc">
+              Concatenate the device ID with <code>Date.now()</code>. This binds the identity
+              to the installation moment, not permanently to the hardware.
+            </p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">03</div>
+          <div class="flow-content">
+            <div class="flow-title">SHA-256 Hash — 16 chars</div>
+            <p class="flow-desc">
+              Compute a SHA-256 hash of the combined string and extract the first 16 characters.
+              The result is an opaque, irreversible identifier with zero PII.
+            </p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">04</div>
+          <div class="flow-content">
+            <div class="flow-title">Generate Anonymous Display Name</div>
+            <p class="flow-desc">
+              Auto-generate a randomized display name (e.g. <em>"Curioso Misterioso 452"</em>)
+              for public interactions like posting reviews.
+            </p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">05</div>
+          <div class="flow-content">
+            <div class="flow-title">Persist to AsyncStorage</div>
+            <p class="flow-desc">
+              Serialize the identity payload locally. On every subsequent launch the app loads
+              the <code>hashedId</code> and passes it as the <code>user-id</code> header to the backend API.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <pre><code><span class="cm">// First-launch identity generation</span>
 <span class="ck">const</span> <span class="cv">deviceId</span>  = <span class="ck">await</span> DeviceInfo.<span class="cv-high">getUniqueId</span>();
 <span class="ck">const</span> <span class="cv">salt</span>      = String(Date.<span class="cv-high">now</span>());
 <span class="ck">const</span> <span class="cv">raw</span>       = <span class="cv">deviceId</span> + <span class="cv">salt</span>;
@@ -652,172 +849,173 @@
   <span class="cv">createdAt</span>:   Date.<span class="cv-high">now</span>(),
 }));</code></pre>
 
-    <div class="callout">
-      <div class="callout-title">Privacy by Design</div>
-      <p>
-        Because the hash is salted with <code>Date.now()</code>, a reinstall generates a
-        completely new identity. Cross-installation tracking is architecturally impossible —
-        not just a policy choice.
-      </p>
-    </div>
-
-    <h3>Backend Integration</h3>
-    <p>
-      The 16-character <code>hashedId</code> acts as a primary key on the server.
-      Preferences and reviews are mapped directly to this string. To the API it is
-      indistinguishable from a traditional user ID — but with zero PII attached.
-    </p>
-  </section>
-
-  <!-- ═══════════════════════════ 03 — SECURITY ═══════════════════════════ -->
-  <section id="security">
-    <div class="section-label">03 — Security &amp; Compliance</div>
-    <h2>The Security Case</h2>
-    <p>
-      If you propose this architecture, expect pushback from security purists.
-      Here is the data-backed defense.
-    </p>
-
-    <div class="tier-grid">
-      <div class="tier-row header">
-        <div class="tier-cell">Threat</div>
-        <div class="tier-cell">Traditional Auth</div>
-        <div class="tier-cell">Zero-Login</div>
-      </div>
-      <div class="tier-row">
-        <div class="tier-cell"><strong>Credential Stuffing</strong></div>
-        <div class="tier-cell">High risk — passwords are a persistent target</div>
-        <div class="tier-cell" style="color:var(--high)">No attack surface — no passwords exist</div>
-      </div>
-      <div class="tier-row">
-        <div class="tier-cell"><strong>Phishing</strong></div>
-        <div class="tier-cell">High risk — login forms are prime targets</div>
-        <div class="tier-cell" style="color:var(--high)">Eliminated — no login form exists</div>
-      </div>
-      <div class="tier-row">
-        <div class="tier-cell"><strong>DB Breach</strong></div>
-        <div class="tier-cell">Emails and hashed passwords exposed</div>
-        <div class="tier-cell" style="color:var(--high)">Opaque 16-char strings — zero PII</div>
-      </div>
-      <div class="tier-row">
-        <div class="tier-cell"><strong>Right to be Forgotten</strong></div>
-        <div class="tier-cell">Requires an explicit deletion API</div>
-        <div class="tier-cell" style="color:var(--high)">Built-in: uninstall destroys the identity</div>
-      </div>
-    </div>
-
-    <div class="callout">
-      <div class="callout-title">GDPR Article 5(1)(c) — Data Minimization</div>
-      <p>
-        Personal data must be <em>"adequate, relevant, and limited to what is necessary."</em>
-        By using an anonymous salted hash, we collect no PII at all. Even so, Travelguidehub
-        still ships a dedicated Privacy Settings page: an explicit GDPR consent toggle is
-        required before any review is posted, and a single button triggers an API call that
-        scrubs all data associated with the current <code>hashedId</code>.
-      </p>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════ 04 — TRADE-OFFS ═══════════════════════════ -->
-  <section id="tradeoffs">
-    <div class="section-label">04 — Trade-offs</div>
-    <h2>Edge Cases &amp; Honest Answers</h2>
-    <p>No architecture is a silver bullet. Here is how we handle the inherent downsides.</p>
-
-    <div class="faq-item">
-      <div class="faq-q">Q — What if the user reinstalls the app or changes their phone?</div>
-      <p class="faq-a">
-        They get a completely new identity — by design. For a travel guide where data is
-        highly contextual to a specific short-term trip, this is an acceptable trade-off
-        for maximum privacy. Apps that require long-term persistence should use a
-        <strong>Progressive Upgrade</strong> pattern: let users optionally link an email
-        later, once they have a reason to care about cross-device continuity.
-      </p>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-q">Q — How do you handle GDPR consent?</div>
-      <p class="faq-a">
-        Even with an anonymous ID, users must explicitly toggle a consent switch in Privacy
-        Settings before their device identity is used to post public reviews. A separate
-        button calls the backend to hard-delete all data tied to the current
-        <code>hashedId</code> — full "right to be forgotten" in a single tap.
-      </p>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-q">Q — Can a bad actor flood the system with fake reviews by reinstalling?</div>
-      <p class="faq-a">
-        Yes — this is the primary attack vector. Mitigation requires IP-based rate limiting
-        at the API layer and strict server-side validation. Treat anonymous IDs with the
-        same suspicion as any unauthenticated endpoint: rate-limit aggressively and
-        shadow-ban on suspicious review velocity.
-      </p>
-    </div>
-
-    <div class="compare">
-      <div class="compare-box bad">
-        <div class="compare-label bad">When not to use this pattern</div>
-        <ul>
-          <li>Cross-device sync is required</li>
-          <li>Long-term account history matters</li>
-          <li>Paid subscriptions or billing</li>
-          <li>Social features requiring a persistent identity</li>
-        </ul>
-      </div>
-      <div class="compare-box highlight good">
-        <div class="compare-label good">When this pattern shines</div>
-        <ul>
-          <li>Travel &amp; utility apps (contextual use)</li>
-          <li>Content platforms (read-heavy)</li>
-          <li>TTFV is the primary acquisition metric</li>
-          <li>Privacy-first, GDPR-sensitive markets</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════ 05 — AUTHOR ═══════════════════════════ -->
-  <section id="author">
-    <div class="section-label">05 — Author</div>
-    <h2>About This Article</h2>
-    <p>
-      The Zero-Login architecture described here is not theoretical. I designed and
-      implemented it end-to-end for <strong>Travelguidehub</strong> — handling the
-      React Native client identity flow, the backend API integration, and the full
-      GDPR compliance layer.
-    </p>
-
-    <div class="author-block">
-      <div class="author-avatar">AM</div>
-      <div>
-        <div class="author-name">Alessandro Marocchini</div>
-        <p class="author-bio">
-          Software architect and developer. Built the Device-Bound Identity system
-          for Travelguidehub from scratch — from the SHA-256 salting strategy on the
-          React Native client to the anonymous primary key design on the backend and
-          the GDPR opt-in / data-deletion flows.
+      <div class="callout">
+        <div class="callout-title">Privacy by Design</div>
+        <p>
+          Because the hash is salted with <code>Date.now()</code>, a reinstall generates a
+          completely new identity. Cross-installation tracking is architecturally impossible —
+          not just a policy choice.
         </p>
-        <span class="author-project">Travelguidehub</span>
+      </div>
+
+      <h3>Backend Integration</h3>
+      <p>
+        The 16-character <code>hashedId</code> acts as a primary key on the server.
+        Preferences and reviews are mapped directly to this string. To the API it is
+        indistinguishable from a traditional user ID — but with zero PII attached.
+      </p>
+    </section>
+
+    <!-- ═══════════════════════════ 03 — SECURITY ═══════════════════════════ -->
+    <section id="security">
+      <div class="section-label">03 — Security &amp; Compliance</div>
+      <h2>The Security Case</h2>
+      <p>
+        If you propose this architecture, expect pushback from security purists.
+        Here is the data-backed defense.
+      </p>
+
+      <div class="tier-grid">
+        <div class="tier-row header">
+          <div class="tier-cell">Threat</div>
+          <div class="tier-cell">Traditional Auth</div>
+          <div class="tier-cell">Zero-Login</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-cell"><strong>Credential Stuffing</strong></div>
+          <div class="tier-cell">High risk — passwords are a persistent target</div>
+          <div class="tier-cell" style="color:var(--high)">No attack surface — no passwords exist</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-cell"><strong>Phishing</strong></div>
+          <div class="tier-cell">High risk — login forms are prime targets</div>
+          <div class="tier-cell" style="color:var(--high)">Eliminated — no login form exists</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-cell"><strong>DB Breach</strong></div>
+          <div class="tier-cell">Emails and hashed passwords exposed</div>
+          <div class="tier-cell" style="color:var(--high)">Opaque 16-char strings — zero PII</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-cell"><strong>Right to be Forgotten</strong></div>
+          <div class="tier-cell">Requires an explicit deletion API</div>
+          <div class="tier-cell" style="color:var(--high)">Built-in: uninstall destroys the identity</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">GDPR Article 5(1)(c) — Data Minimization</div>
+        <p>
+          Personal data must be <em>"adequate, relevant, and limited to what is necessary."</em>
+          By using an anonymous salted hash, we collect no PII at all. Even so, Travelguidehub
+          still ships a dedicated Privacy Settings page: an explicit GDPR consent toggle is
+          required before any review is posted, and a single button triggers an API call that
+          scrubs all data associated with the current <code>hashedId</code>.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ 04 — TRADE-OFFS ═══════════════════════════ -->
+    <section id="tradeoffs">
+      <div class="section-label">04 — Trade-offs</div>
+      <h2>Edge Cases &amp; Honest Answers</h2>
+      <p>No architecture is a silver bullet. Here is how we handle the inherent downsides.</p>
+
+      <div class="faq-item">
+        <div class="faq-q">Q — What if the user reinstalls the app or changes their phone?</div>
+        <p class="faq-a">
+          They get a completely new identity — by design. For a travel guide where data is
+          highly contextual to a specific short-term trip, this is an acceptable trade-off
+          for maximum privacy. Apps that require long-term persistence should use a
+          <strong>Progressive Upgrade</strong> pattern: let users optionally link an email
+          later, once they have a reason to care about cross-device continuity.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Q — How do you handle GDPR consent?</div>
+        <p class="faq-a">
+          Even with an anonymous ID, users must explicitly toggle a consent switch in Privacy
+          Settings before their device identity is used to post public reviews. A separate
+          button calls the backend to hard-delete all data tied to the current
+          <code>hashedId</code> — full "right to be forgotten" in a single tap.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Q — Can a bad actor flood the system with fake reviews by reinstalling?</div>
+        <p class="faq-a">
+          Yes — this is the primary attack vector. Mitigation requires IP-based rate limiting
+          at the API layer and strict server-side validation. Treat anonymous IDs with the
+          same suspicion as any unauthenticated endpoint: rate-limit aggressively and
+          shadow-ban on suspicious review velocity.
+        </p>
+      </div>
+
+      <div class="compare">
+        <div class="compare-box bad">
+          <div class="compare-label bad">When not to use this pattern</div>
+          <ul>
+            <li>Cross-device sync is required</li>
+            <li>Long-term account history matters</li>
+            <li>Paid subscriptions or billing</li>
+            <li>Social features requiring a persistent identity</li>
+          </ul>
+        </div>
+        <div class="compare-box highlight good">
+          <div class="compare-label good">When this pattern shines</div>
+          <ul>
+            <li>Travel &amp; utility apps (contextual use)</li>
+            <li>Content platforms (read-heavy)</li>
+            <li>TTFV is the primary acquisition metric</li>
+            <li>Privacy-first, GDPR-sensitive markets</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ 05 — AUTHOR ═══════════════════════════ -->
+    <section id="author">
+      <div class="section-label">05 — Author</div>
+      <h2>About This Article</h2>
+      <p>
+        The Zero-Login architecture described here is not theoretical. I designed and
+        implemented it end-to-end for <strong>Travelguidehub</strong> — handling the
+        React Native client identity flow, the backend API integration, and the full
+        GDPR compliance layer.
+      </p>
+
+      <div class="author-block">
+        <div class="author-avatar">AM</div>
+        <div>
+          <div class="author-name">Alessandro Marocchini</div>
+          <p class="author-bio">
+            Software architect and developer. Built the Device-Bound Identity system
+            for Travelguidehub from scratch — from the SHA-256 salting strategy on the
+            React Native client to the anonymous primary key design on the backend and
+            the GDPR opt-in / data-deletion flows.
+          </p>
+          <span class="author-project">Travelguidehub</span>
+        </div>
+      </div>
+
+      <p style="margin-top:1.5rem">
+        Have you experimented with frictionless authentication in your projects?
+        Thoughts on the trade-offs are welcome.
+      </p>
+    </section>
+
+  </div><!-- /container -->
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-text">© 2026 Alessandro Marocchini — Travelguidehub</span>
+        <a href="https://alessandro-marocchini.github.io/ckp-llm/" class="footer-link">← Back to articles</a>
       </div>
     </div>
-
-    <p style="margin-top:1.5rem">
-      Have you experimented with frictionless authentication in your projects?
-      Thoughts on the trade-offs are welcome.
-    </p>
-  </section>
-
-</div><!-- /container -->
-
-<footer>
-  <div class="container">
-    <div class="footer-inner">
-      <span class="footer-text">© 2026 Alessandro Marocchini — Travelguidehub</span>
-      <a href="https://alessandro-marocchini.github.io/ckp-llm/" class="footer-link">← Back to articles</a>
-    </div>
-  </div>
-</footer>
+  </footer>
 
 </body>
+
 </html>
