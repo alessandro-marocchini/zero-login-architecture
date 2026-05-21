@@ -1,0 +1,131 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap');
+    </style>
+    <!-- Dot grid pattern -->
+    <pattern id="dots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#1e1e1e"/>
+    </pattern>
+    <!-- Glow filter for accent elements -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="fade-right" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0d0d0d" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0d0d0d" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="fade-left" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0d0d0d" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#0d0d0d" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base background -->
+  <rect width="1200" height="630" fill="#0d0d0d"/>
+
+  <!-- Dot grid texture -->
+  <rect width="1200" height="630" fill="url(#dots)" opacity="0.6"/>
+
+  <!-- Right-side decorative: large "0" glyph -->
+  <text
+    x="820" y="500"
+    font-family="'Instrument Serif', Georgia, serif"
+    font-size="600"
+    font-style="italic"
+    fill="#c8f060"
+    opacity="0.06"
+    letter-spacing="-20"
+  >0</text>
+
+  <!-- Accent horizontal rule top -->
+  <line x1="64" y1="64" x2="340" y2="64" stroke="#c8f060" stroke-width="1" opacity="0.5"/>
+
+  <!-- Tag label -->
+  <text x="64" y="57" font-family="'DM Mono', 'Courier New', monospace" font-size="13" fill="#c8f060" letter-spacing="3" opacity="0.9">ARCHITECTURE PATTERN · 2026</text>
+
+  <!-- Main title line 1 -->
+  <text
+    x="64" y="230"
+    font-family="'Instrument Serif', Georgia, serif"
+    font-size="96"
+    fill="#e8e8e0"
+    letter-spacing="-2"
+  >The Zero-Login</text>
+
+  <!-- Main title line 2 — italic accent -->
+  <text
+    x="64" y="340"
+    font-family="'Instrument Serif', Georgia, serif"
+    font-size="96"
+    font-style="italic"
+    fill="#c8f060"
+    letter-spacing="-2"
+  >Architecture</text>
+
+  <!-- Subtitle -->
+  <text
+    x="66" y="400"
+    font-family="'DM Mono', 'Courier New', monospace"
+    font-size="20"
+    fill="#888888"
+    letter-spacing="0.5"
+  >Why we built Travelguidehub without user accounts</text>
+
+  <!-- Divider line -->
+  <line x1="64" y1="444" x2="560" y2="444" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- Author block -->
+  <!-- Avatar circle -->
+  <circle cx="88" cy="490" r="22" fill="#1c1c1c" stroke="rgba(200,240,96,0.3)" stroke-width="1"/>
+  <text x="88" y="496" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="13" fill="#c8f060">AM</text>
+
+  <!-- Author name -->
+  <text x="122" y="484" font-family="'DM Mono', 'Courier New', monospace" font-size="13" fill="#e8e8e0" letter-spacing="1.5">ALESSANDRO MAROCCHINI</text>
+
+  <!-- Project badge -->
+  <rect x="122" y="494" width="130" height="20" rx="3" fill="rgba(200,240,96,0.1)" stroke="rgba(200,240,96,0.2)" stroke-width="1"/>
+  <text x="187" y="508" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="11" fill="#c8f060" letter-spacing="1">TRAVELGUIDEHUB</text>
+
+  <!-- Right side: flow diagram visual -->
+  <!-- Traditional path label -->
+  <text x="820" y="168" font-family="'DM Mono', 'Courier New', monospace" font-size="11" fill="#f09060" letter-spacing="2" opacity="0.8">TRADITIONAL</text>
+  <!-- Steps with X -->
+  <g opacity="0.7">
+    <rect x="820" y="182" width="160" height="32" rx="4" fill="#1c1c1c" stroke="#2a2a2a" stroke-width="1"/>
+    <text x="900" y="203" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="12" fill="#888">Download</text>
+    <line x1="900" y1="214" x2="900" y2="226" stroke="#2a2a2a" stroke-width="1"/>
+    <rect x="820" y="226" width="160" height="32" rx="4" fill="#1c1c1c" stroke="#2a2a2a" stroke-width="1"/>
+    <text x="900" y="247" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="12" fill="#888">Open app</text>
+    <line x1="900" y1="258" x2="900" y2="270" stroke="#2a2a2a" stroke-width="1"/>
+    <rect x="820" y="270" width="160" height="32" rx="4" fill="#2a1a1a" stroke="#f09060" stroke-width="1"/>
+    <text x="900" y="291" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="12" fill="#f09060">✕ Register</text>
+    <line x1="900" y1="302" x2="900" y2="314" stroke="#2a2a2a" stroke-width="1"/>
+    <rect x="820" y="314" width="160" height="32" rx="4" fill="#2a1a1a" stroke="#f09060" stroke-width="1"/>
+    <text x="900" y="335" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="12" fill="#f09060">✕ Verify OTP</text>
+    <line x1="900" y1="346" x2="900" y2="358" stroke="#2a2a2a" stroke-width="1"/>
+    <rect x="820" y="358" width="160" height="32" rx="4" fill="#1c1c1c" stroke="#2a2a2a" stroke-width="1"/>
+    <text x="900" y="379" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="12" fill="#888">Explore</text>
+  </g>
+
+  <!-- Zero-Login path label -->
+  <text x="1020" y="168" font-family="'DM Mono', 'Courier New', monospace" font-size="11" fill="#c8f060" letter-spacing="2" opacity="0.9">ZERO-LOGIN</text>
+  <!-- Steps with checks -->
+  <g opacity="0.9">
+    <rect x="1020" y="182" width="150" height="32" rx="4" fill="#1c1c1c" stroke="#2a2a2a" stroke-width="1"/>
+    <text x="1095" y="203" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="12" fill="#888">Download</text>
+    <line x1="1095" y1="214" x2="1095" y2="226" stroke="#c8f060" stroke-width="1" opacity="0.4"/>
+    <rect x="1020" y="226" width="150" height="32" rx="4" fill="#1c1c1c" stroke="#2a2a2a" stroke-width="1"/>
+    <text x="1095" y="247" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="12" fill="#888">Open app</text>
+    <line x1="1095" y1="258" x2="1095" y2="270" stroke="#c8f060" stroke-width="1" opacity="0.4"/>
+    <rect x="1020" y="270" width="150" height="32" rx="4" fill="rgba(200,240,96,0.08)" stroke="rgba(200,240,96,0.4)" stroke-width="1" filter="url(#glow)"/>
+    <text x="1095" y="291" text-anchor="middle" font-family="'DM Mono', 'Courier New', monospace" font-size="12" fill="#c8f060">→ Explore</text>
+  </g>
+
+  <!-- Bottom accent line -->
+  <line x1="0" y1="620" x2="1200" y2="620" stroke="#c8f060" stroke-width="1" opacity="0.15"/>
+
+  <!-- Fade overlay left edge of right panel -->
+  <rect x="760" y="0" width="80" height="630" fill="url(#fade-left)"/>
+</svg>
