@@ -127,7 +127,8 @@ No architecture is a silver bullet. Here is how we manage the inherent downsides
 
 ## Conclusion
 
-The Zero-Login architecture is not suitable for every domain. But for utility apps, travel guides, and content platforms where immediate access is more valuable than long-term cross-device tracking, Device-Bound Identity offers an unparalleled user experience. 
+The Zero-Login architecture is not suitable for every domain. 
+But for utility apps, travel guides, and content platforms where immediate access is more valuable than long-term cross-device tracking, Device-Bound Identity offers an unparalleled user experience. 
 
 It aligns perfectly with modern data minimization principles, neutralizes credential-based cyberattacks, and most importantly respects the user's time.
 
