@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
   <meta charset="UTF-8" />
@@ -8,20 +8,30 @@
 
   <!--
     In produzione sostituisci questo link con:
-    href="https://alessandro-marocchini.github.io//designsystem/editorial.css"
+    href="https://TUO-ACCOUNT.github.io/designsystem/editorial.css"
   -->
-  <link rel="stylesheet" href="https://alessandro-marocchini.github.io//designsystem/editorial.css" />
+  <link rel="stylesheet" href="./designsystem/editorial.css" />
+
+  <!-- Applica il tema salvato PRIMA del paint per evitare flash -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('ed-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
 
   <!-- Article-specific overrides (minimi, non rompono il sistema) -->
   <style>
     /* Aggiusta il padding-top del body per la nav fissa */
     .ed-hero { padding-top: 0; }
 
-    /* Evidenzia keyword nel codice */
-    .kw  { color: #c8f060; }
+    /* Code highlight — adattivo al tema */
+    .kw  { color: var(--accent); }
     .str { color: #7dd3a8; }
-    .cmt { color: #5f5f5f; font-style: italic; }
+    [data-theme="light"] .str { color: #2d7a56; }
+    .cmt { color: var(--text-dim); font-style: italic; }
     .num { color: #f9a67b; }
+    [data-theme="light"] .num { color: #c05c1a; }
 
     /* Arch diagram node */
     .arch-node {
@@ -74,6 +84,14 @@
       <li><a href="#architecture">Architecture</a></li>
       <li><a href="#security">Security</a></li>
       <li><a href="#future">Future</a></li>
+      <li>
+        <button
+          class="ed-theme-toggle"
+          id="themeToggle"
+          aria-label="Toggle light/dark mode"
+          title="Toggle theme"
+        >☀️</button>
+      </li>
     </ul>
   </nav>
 
@@ -744,6 +762,37 @@
       <a href="#" class="ed-footer__link">Back to articles</a>
     </div>
   </footer>
+
+  <!-- ═══════════════════════════════════════════════
+       THEME TOGGLE SCRIPT
+  ═══════════════════════════════════════════════ -->
+  <script>
+    (function () {
+      const html   = document.documentElement;
+      const btn    = document.getElementById('themeToggle');
+      const LIGHT  = 'light';
+      const DARK   = 'dark';
+
+      // Icona coerente con il tema attuale
+      function syncIcon() {
+        const isDark = html.getAttribute('data-theme') === DARK;
+        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+      }
+
+      // Toggle
+      btn.addEventListener('click', function () {
+        const current = html.getAttribute('data-theme') || LIGHT;
+        const next    = current === LIGHT ? DARK : LIGHT;
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('ed-theme', next);
+        syncIcon();
+      });
+
+      // Stato iniziale
+      syncIcon();
+    })();
+  </script>
 
 </body>
 </html>
