@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zero Login Architecture</title>
 
+  <!-- Google Fonts — caricato qui in HTML, più affidabile di @import in CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" />
+
   <!--
     In produzione sostituisci questo link con:
     href="https://TUO-ACCOUNT.github.io/designsystem/editorial.css"
@@ -40,7 +45,49 @@
     .num { color: #c05c1a; }
     [data-theme="dark"] .num { color: #f9a67b; }
 
-    /* ── ARCH DIAGRAM NODES ── */
+    /* ── IMAGE PLACEHOLDERS (rimuovi quando hai le vere foto) ── */
+    .img-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      min-height: 420px;
+      position: relative;
+      overflow: hidden;
+    }
+    .img-placeholder--ui {
+      background: linear-gradient(135deg,
+        var(--surface) 0%,
+        var(--surface-2) 50%,
+        var(--bg-alt) 100%
+      );
+    }
+    .img-placeholder--sec {
+      background: linear-gradient(135deg,
+        var(--bg-alt) 0%,
+        var(--surface) 60%,
+        var(--surface-3) 100%
+      );
+    }
+    .img-placeholder__inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      opacity: .45;
+    }
+    .img-placeholder__icon {
+      font-size: 3rem;
+      filter: grayscale(1);
+    }
+    .img-placeholder__label {
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
     .arch-node {
       background: var(--surface-2);
       border: 1px solid var(--border);
@@ -249,16 +296,12 @@
           </div>
         </div>
 
-        <!-- Immagine -->
+        <!-- Immagine — sostituisci src con la tua foto -->
         <div>
-          <!--
-            friction-ui.jpg — screenshot UI frictionless
-            Dimensioni consigliate: 800×1000
-          -->
           <img
             src="friction-ui.jpg"
             class="ed-image ed-image--tall"
-            alt="Frictionless experience"
+            alt="Frictionless UI experience"
             loading="lazy"
           />
         </div>
@@ -515,12 +558,8 @@
 
       <div class="ed-grid ed-grid--reverse">
 
-        <!-- Immagine -->
+        <!-- Immagine — sostituisci src con la tua foto -->
         <div>
-          <!--
-            security.jpg — immagine security/cyber
-            Dimensioni consigliate: 800×1000
-          -->
           <img
             src="security.jpg"
             class="ed-image ed-image--tall"
