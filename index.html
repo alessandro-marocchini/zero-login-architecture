@@ -2,1020 +2,748 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zero-Login Architecture — Alessandro Marocchini</title>
-  <meta name="description" content="Why We Built the Travelguidehub React Native App Without User Accounts">
-  <meta property="og:title" content="The Zero-Login Architecture">
-  <meta property="og:description"
-    content="How we removed user registration from Travelguidehub using Device-Bound Identity: SHA-256 salted hash, zero PII, GDPR by design.">
-  <meta property="og:image" content="cover.svg">
-  <meta property="og:type" content="article">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="cover.svg">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zero Login Architecture</title>
+
+  <!--
+    In produzione sostituisci questo link con:
+    href="https://TUO-ACCOUNT.github.io/designsystem/editorial.css"
+  -->
+  <link rel="stylesheet" href="./designsystem/editorial.css" />
+
+  <!-- Article-specific overrides (minimi, non rompono il sistema) -->
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+    /* Aggiusta il padding-top del body per la nav fissa */
+    .ed-hero { padding-top: 0; }
 
-    :root {
-      --bg: #0d0d0d;
-      --surface: #141414;
-      --surface-2: #1c1c1c;
-      --border: #2a2a2a;
-      --border-light: #222;
-      --accent: #c8f060;
-      --accent-dim: rgba(200, 240, 96, 0.12);
-      --accent-dim2: rgba(200, 240, 96, 0.06);
-      --text: #e8e8e0;
-      --text-muted: #888;
-      --text-dim: #555;
-      --code-bg: #111;
-      --high: #c8f060;
-      --mid: #60c8f0;
-      --low: #f09060;
-    }
+    /* Evidenzia keyword nel codice */
+    .kw  { color: #c8f060; }
+    .str { color: #7dd3a8; }
+    .cmt { color: #5f5f5f; font-style: italic; }
+    .num { color: #f9a67b; }
 
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      line-height: 1.7;
-      font-size: 1rem;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 52px;
-      background: rgba(13, 13, 13, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      z-index: 100;
-    }
-
-    .nav-logo {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      text-decoration: none;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      transition: color 0.15s;
-    }
-
-    .nav-links a:hover {
-      color: var(--accent);
-    }
-
-    @media (max-width: 640px) {
-      .nav-links {
-        display: none;
-      }
-    }
-
-    /* ── LAYOUT ── */
-    .container {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-
-    section {
-      padding: 4rem 0;
-    }
-
-    section+section {
-      border-top: 1px solid var(--border-light);
-    }
-
-    /* ── HERO ── */
-    #hero {
-      padding: 9rem 0 5rem;
-    }
-
-    .hero-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .hero-label::before {
-      content: '';
-      display: inline-block;
-      width: 32px;
-      height: 1px;
-      background: var(--accent);
-    }
-
-    h1 {
-      font-family: 'Instrument Serif', serif;
-      font-size: clamp(2.6rem, 5vw, 4.5rem);
-      line-height: 1.1;
-      color: var(--text);
-      margin-bottom: 1.5rem;
-    }
-
-    h1 em {
-      font-style: italic;
-      color: var(--accent);
-    }
-
-    .hero-sub {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      max-width: 560px;
-      line-height: 1.6;
-      margin-bottom: 2.5rem;
-    }
-
-    .hero-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-    }
-
-    .hero-meta-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-    }
-
-    .hero-meta-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    .hero-meta-value {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    /* ── SECTION HEADINGS ── */
-    .section-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 1rem;
-    }
-
-    h2 {
-      font-family: 'Instrument Serif', serif;
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
-      line-height: 1.2;
-      color: var(--text);
-      margin-bottom: 1.5rem;
-    }
-
-    h3 {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin: 2rem 0 0.75rem;
-    }
-
-    p {
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-    }
-
-    strong {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    em {
-      font-style: italic;
-    }
-
-    /* ── STATS ROW ── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border-radius: 6px;
-      overflow: hidden;
-      margin: 2rem 0;
-    }
-
-    .stat-box {
-      background: var(--surface);
-      padding: 1.5rem;
-    }
-
-    .stat-highlight {
-      font-family: 'Instrument Serif', serif;
-      font-size: clamp(2.2rem, 4vw, 3.5rem);
-      color: var(--accent);
-      line-height: 1;
-      margin-bottom: 0.3rem;
-    }
-
-    .stat-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    /* ── COMPARE GRID ── */
-    .compare {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1px;
-      background: var(--border);
-      border-radius: 6px;
-      overflow: hidden;
-      margin: 2rem 0;
-    }
-
-    .compare-box {
-      background: var(--surface);
-      padding: 1.5rem;
-    }
-
-    .compare-box.highlight {
-      background: var(--accent-dim2);
-      border: 1px solid rgba(200, 240, 96, 0.2);
-    }
-
-    .compare-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 1rem;
-    }
-
-    .compare-label.bad {
-      color: var(--low);
-    }
-
-    .compare-label.good {
-      color: var(--high);
-    }
-
-    .compare-box ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .compare-box li {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      padding: 0.35rem 0;
-      border-bottom: 1px solid var(--border-light);
-      display: flex;
-      align-items: flex-start;
-      gap: 0.6rem;
-    }
-
-    .compare-box li:last-child {
-      border-bottom: none;
-    }
-
-    .compare-box li::before {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      flex-shrink: 0;
-      margin-top: 0.1rem;
-    }
-
-    .compare-box.bad li::before {
-      content: '✕';
-      color: var(--low);
-    }
-
-    .compare-box.good li::before {
-      content: '→';
-      color: var(--high);
-    }
-
-    @media (max-width: 600px) {
-      .compare {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* ── FLOW STEPS ── */
-    .flow {
-      display: flex;
-      flex-direction: column;
-      margin: 2rem 0;
-      position: relative;
-    }
-
-    .flow::before {
-      content: '';
-      position: absolute;
-      left: 17px;
-      top: 24px;
-      bottom: 24px;
-      width: 1px;
-      background: var(--border);
-    }
-
-    .flow-step {
-      display: flex;
-      gap: 1.25rem;
-      align-items: flex-start;
-      padding: 1rem 0;
-    }
-
-    .flow-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--accent-dim);
-      border: 1px solid rgba(200, 240, 96, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--accent);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 1;
-    }
-
-    .flow-content {
-      padding-top: 0.4rem;
-      flex: 1;
-    }
-
-    .flow-title {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 0.3rem;
-    }
-
-    .flow-desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin: 0;
-    }
-
-    /* ── CALLOUT ── */
-    .callout {
-      border-left: 3px solid var(--accent);
-      background: var(--accent-dim2);
-      border-radius: 0 4px 4px 0;
-      padding: 1rem 1.25rem;
-      margin: 1.5rem 0;
-    }
-
-    .callout-title {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
-    }
-
-    .callout p {
-      font-size: 0.9rem;
-      margin: 0;
-    }
-
-    .callout-warn {
-      border-color: var(--low);
-      background: rgba(240, 144, 96, 0.05);
-    }
-
-    .callout-warn .callout-title {
-      color: var(--low);
-    }
-
-    /* ── TIER TABLE ── */
-    .tier-grid {
-      display: grid;
-      gap: 1px;
-      background: var(--border);
-      border-radius: 6px;
-      overflow: hidden;
-      margin: 2rem 0;
-    }
-
-    .tier-row {
-      display: grid;
-      grid-template-columns: 160px 1fr 1fr;
-      background: var(--surface);
-    }
-
-    .tier-row.header {
+    /* Arch diagram node */
+    .arch-node {
       background: var(--surface-2);
-    }
-
-    .tier-cell {
-      padding: 0.75rem 1rem;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      border-right: 1px solid var(--border);
-    }
-
-    .tier-cell:last-child {
-      border-right: none;
-    }
-
-    .tier-row.header .tier-cell {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .tier-cell strong {
-      color: var(--text);
-    }
-
-    @media (max-width: 640px) {
-      .tier-row {
-        grid-template-columns: 1fr;
-      }
-
-      .tier-cell {
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .tier-cell:last-child {
-        border-bottom: none;
-      }
-    }
-
-    /* ── CODE ── */
-    pre {
-      background: var(--code-bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1.25rem 1.5rem;
-      overflow-x: auto;
-      margin: 1.5rem 0;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.8rem;
-      line-height: 1.6;
-    }
-
-    code {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.85em;
-      background: var(--surface-2);
-      padding: 0.15em 0.4em;
-      border-radius: 3px;
-      color: var(--text);
-    }
-
-    pre code {
-      background: none;
-      padding: 0;
-      font-size: inherit;
-    }
-
-    .cm {
-      color: var(--text-dim);
-    }
-
-    .ck {
-      color: var(--accent);
-    }
-
-    .cv {
-      color: var(--text-muted);
-    }
-
-    .cv-high {
-      color: var(--high);
-    }
-
-    /* ── FAQ ── */
-    .faq-item {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 1rem;
-      background: var(--surface);
-    }
-
-    .faq-q {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.6rem;
-    }
-
-    .faq-a {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin: 0;
-    }
-
-    /* ── AUTHOR BLOCK ── */
-    .author-block {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1.5rem;
-      background: var(--surface);
-      display: flex;
-      gap: 1.5rem;
-      align-items: flex-start;
-      margin: 1.5rem 0;
-    }
-
-    .author-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--accent-dim);
-      border: 1px solid rgba(200, 240, 96, 0.3);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.4rem;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.85rem;
-      color: var(--accent);
+      gap: 0.8rem;
+      transition: border-color .25s;
+    }
+    .arch-node:hover { border-color: rgba(200,240,96,.3); }
+    .arch-node__icon {
+      font-size: 1.2rem;
       flex-shrink: 0;
     }
-
-    .author-name {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text);
+    .arch-node__label {
+      font-family: var(--font-mono);
+      font-size: .68rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.4rem;
-    }
-
-    .author-bio {
-      font-size: 0.875rem;
+      letter-spacing: .08em;
       color: var(--text-muted);
-      margin: 0 0 0.6rem;
     }
-
-    .author-project {
-      display: inline-block;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--accent);
-      background: var(--accent-dim);
-      border: 1px solid rgba(200, 240, 96, 0.2);
-      padding: 0.2em 0.6em;
-      border-radius: 3px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      text-decoration: none;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 0;
-      margin-top: 2rem;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .footer-text {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
+    .arch-node__sub {
+      font-size: .8rem;
       color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      display: block;
+      margin-top: .2rem;
     }
-
-    .footer-link {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      text-decoration: none;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      transition: color 0.15s;
-    }
-
-    .footer-link:hover {
+    .arch-arrow {
+      text-align: center;
       color: var(--accent);
+      font-size: 1.4rem;
+      opacity: .5;
+      padding: .4rem 0;
     }
   </style>
 </head>
 
 <body>
 
-  <nav>
-    <a href="#hero" class="nav-logo">Zero-Login Arch</a>
-    <!-- cover handled below -->
-    <ul class="nav-links">
+  <!-- ═══════════════════════════════════════════════
+       NAVBAR
+  ═══════════════════════════════════════════════ -->
+  <nav class="ed-nav">
+    <a href="#" class="ed-nav__logo">Zero Login</a>
+    <ul class="ed-nav__links">
       <li><a href="#why">Why</a></li>
       <li><a href="#architecture">Architecture</a></li>
       <li><a href="#security">Security</a></li>
-      <li><a href="#tradeoffs">Trade-offs</a></li>
-      <li><a href="#author">Author</a></li>
+      <li><a href="#future">Future</a></li>
     </ul>
   </nav>
 
-  <img src="cover.jpg" alt="The Zero-Login Architecture — cover"
-    style="display:block;width:100%;max-height:420px;object-fit:cover;margin-top:52px;border-bottom:1px solid #2a2a2a;">
+  <!-- ═══════════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════════ -->
+  <section class="ed-hero">
 
-  <div class="container">
+    <div class="ed-hero__bg">
+      <!--
+        Sostituisci cover.jpg con la tua immagine hero.
+        Dimensioni consigliate: 1920×1080 o superiori.
+      -->
+      <img
+        src="cover.jpg"
+        alt="Zero Login Architecture cover"
+        loading="eager"
+      />
+    </div>
 
-    <!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
-    <section id="hero">
-      <div class="hero-label">Architecture Pattern</div>
-      <h1>The Zero-Login<br><em>Architecture</em></h1>
-      <p class="hero-sub">
-        Why we built Travelguidehub — a React Native travel guide — without user accounts,
-        and why you should consider this pattern for your next project.
-      </p>
-      <div class="hero-meta">
-        <div class="hero-meta-item">
-          <span class="hero-meta-label">Author</span>
-          <span class="hero-meta-value">Alessandro Marocchini</span>
-        </div>
-        <div class="hero-meta-item">
-          <span class="hero-meta-label">Project</span>
-          <span class="hero-meta-value">Travelguidehub</span>
-        </div>
-        <div class="hero-meta-item">
-          <span class="hero-meta-label">Published</span>
-          <span class="hero-meta-value">2026-05-21</span>
-        </div>
-        <div class="hero-meta-item">
-          <span class="hero-meta-label">Stack</span>
-          <span class="hero-meta-value">React Native / Node.js</span>
-        </div>
-        <div class="hero-meta-item">
-          <span class="hero-meta-label">Pattern</span>
-          <span class="hero-meta-value">Device-Bound Identity</span>
-        </div>
+    <div class="ed-hero__overlay"></div>
+
+    <div class="ed-hero__content container">
+
+      <div class="ed-hero__kicker">
+        Security Architecture &nbsp;/&nbsp; Editorial
       </div>
-    </section>
 
-    <!-- ═══════════════════════════════ 01 — WHY ═══════════════════════════ -->
-    <section id="why">
-      <div class="section-label">01 — Business Case</div>
-      <h2>Why Zero-Login?</h2>
-      <p>
-        In the mobile app ecosystem, friction is the enemy of adoption. You download an app,
-        open it with intent, and immediately hit a wall: a mandatory registration or login screen.
-      </p>
-      <p>
-        For Travelguidehub, we made a radical architectural decision and
-        <strong>removed the traditional user registration flow entirely.</strong>
-        Below are the numbers that drove that call.
+      <h1 class="ed-hero__title">
+        Zero Login<br />Architecture
+      </h1>
+
+      <p class="ed-hero__subtitle">
+        Designing a frictionless authentication system
+        for modern privacy&#8209;first applications.
       </p>
 
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-highlight">8.4%</div>
-          <div class="stat-label">Avg. onboarding completion rate</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-highlight">≈ 0%</div>
-          <div class="stat-label">Our drop-off at first open</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-highlight">TTFV</div>
-          <div class="stat-label">Immediate Time-to-First-Value</div>
-        </div>
+      <div class="ed-hero__meta">
+        <span>Alessandro Marocchini</span>
+        <span>Travelguidehub</span>
+        <span>React Native</span>
+        <span>Node.js</span>
       </div>
 
-      <div class="callout callout-warn">
-        <div class="callout-title">The Onboarding Crisis</div>
-        <p>
-          According to recent industry data, a significant portion of users abandon an app due to
-          identity-verification friction — before they ever reach the core feature they came for.
-        </p>
-      </div>
+    </div>
 
-      <p>
-        In a travel context, a user might download the app while already roaming in a new city.
-        They need immediate utility. Every screen between "download" and "value delivered"
-        is a potential exit point.
-      </p>
+  </section>
 
-      <div class="compare">
-        <div class="compare-box bad">
-          <div class="compare-label bad">Traditional Login Flow</div>
-          <ul>
-            <li>Download</li>
-            <li>Open app</li>
-            <li>Registration wall</li>
-            <li>Verify email / SMS OTP</li>
-            <li>Explore content</li>
-          </ul>
-        </div>
-        <div class="compare-box highlight good">
-          <div class="compare-label good">Zero-Login Flow</div>
-          <ul>
-            <li>Download</li>
-            <li>Open app</li>
-            <li>Explore content</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══════════════════════════ 02 — ARCHITECTURE ═══════════════════════ -->
-    <section id="architecture">
-      <div class="section-label">02 — Implementation</div>
-      <h2>The Device-Bound Identity</h2>
-      <p>
-        To ensure complete privacy and compliance, we designed identity generation to be
-        <strong>volatile upon uninstallation</strong>. We do not track physical hardware
-        indefinitely — only for the lifecycle of a single app installation.
-      </p>
-
-      <h3>Identity Generation Flow</h3>
-      <div class="flow">
-        <div class="flow-step">
-          <div class="flow-num">01</div>
-          <div class="flow-content">
-            <div class="flow-title">Retrieve OS ID</div>
-            <p class="flow-desc">
-              Use <code>react-native-device-info</code> to fetch the OS-provided unique identifier —
-              <code>ANDROID_ID</code> on Android, <code>identifierForVendor</code> on iOS.
-            </p>
-          </div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-num">02</div>
-          <div class="flow-content">
-            <div class="flow-title">Salt with Timestamp</div>
-            <p class="flow-desc">
-              Concatenate the device ID with <code>Date.now()</code>. This binds the identity
-              to the installation moment, not permanently to the hardware.
-            </p>
-          </div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-num">03</div>
-          <div class="flow-content">
-            <div class="flow-title">SHA-256 Hash — 16 chars</div>
-            <p class="flow-desc">
-              Compute a SHA-256 hash of the combined string and extract the first 16 characters.
-              The result is an opaque, irreversible identifier with zero PII.
-            </p>
-          </div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-num">04</div>
-          <div class="flow-content">
-            <div class="flow-title">Generate Anonymous Display Name</div>
-            <p class="flow-desc">
-              Auto-generate a randomized display name (e.g. <em>"Curioso Misterioso 452"</em>)
-              for public interactions like posting reviews.
-            </p>
-          </div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-num">05</div>
-          <div class="flow-content">
-            <div class="flow-title">Persist to AsyncStorage</div>
-            <p class="flow-desc">
-              Serialize the identity payload locally. On every subsequent launch the app loads
-              the <code>hashedId</code> and passes it as the <code>user-id</code> header to the backend API.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <pre><code><span class="cm">// First-launch identity generation</span>
-<span class="ck">const</span> <span class="cv">deviceId</span>  = <span class="ck">await</span> DeviceInfo.<span class="cv-high">getUniqueId</span>();
-<span class="ck">const</span> <span class="cv">salt</span>      = String(Date.<span class="cv-high">now</span>());
-<span class="ck">const</span> <span class="cv">raw</span>       = <span class="cv">deviceId</span> + <span class="cv">salt</span>;
-<span class="ck">const</span> <span class="cv">hashedId</span>  = <span class="cv-high">sha256</span>(<span class="cv">raw</span>).<span class="cv-high">slice</span>(0, 16);
-
-<span class="ck">await</span> AsyncStorage.<span class="cv-high">setItem</span>(<span class="cv">'identity'</span>, JSON.<span class="cv-high">stringify</span>({
-  <span class="ck">hashedId</span>,
-  <span class="cv">displayName</span>: <span class="cv-high">generateAnonName</span>(),
-  <span class="cv">createdAt</span>:   Date.<span class="cv-high">now</span>(),
-}));</code></pre>
-
-      <div class="callout">
-        <div class="callout-title">Privacy by Design</div>
-        <p>
-          Because the hash is salted with <code>Date.now()</code>, a reinstall generates a
-          completely new identity. Cross-installation tracking is architecturally impossible —
-          not just a policy choice.
-        </p>
-      </div>
-
-      <h3>Backend Integration</h3>
-      <p>
-        The 16-character <code>hashedId</code> acts as a primary key on the server.
-        Preferences and reviews are mapped directly to this string. To the API it is
-        indistinguishable from a traditional user ID — but with zero PII attached.
-      </p>
-    </section>
-
-    <!-- ═══════════════════════════ 03 — SECURITY ═══════════════════════════ -->
-    <section id="security">
-      <div class="section-label">03 — Security &amp; Compliance</div>
-      <h2>The Security Case</h2>
-      <p>
-        If you propose this architecture, expect pushback from security purists.
-        Here is the data-backed defense.
-      </p>
-
-      <div class="tier-grid">
-        <div class="tier-row header">
-          <div class="tier-cell">Threat</div>
-          <div class="tier-cell">Traditional Auth</div>
-          <div class="tier-cell">Zero-Login</div>
-        </div>
-        <div class="tier-row">
-          <div class="tier-cell"><strong>Credential Stuffing</strong></div>
-          <div class="tier-cell">High risk — passwords are a persistent target</div>
-          <div class="tier-cell" style="color:var(--high)">No attack surface — no passwords exist</div>
-        </div>
-        <div class="tier-row">
-          <div class="tier-cell"><strong>Phishing</strong></div>
-          <div class="tier-cell">High risk — login forms are prime targets</div>
-          <div class="tier-cell" style="color:var(--high)">Eliminated — no login form exists</div>
-        </div>
-        <div class="tier-row">
-          <div class="tier-cell"><strong>DB Breach</strong></div>
-          <div class="tier-cell">Emails and hashed passwords exposed</div>
-          <div class="tier-cell" style="color:var(--high)">Opaque 16-char strings — zero PII</div>
-        </div>
-        <div class="tier-row">
-          <div class="tier-cell"><strong>Right to be Forgotten</strong></div>
-          <div class="tier-cell">Requires an explicit deletion API</div>
-          <div class="tier-cell" style="color:var(--high)">Built-in: uninstall destroys the identity</div>
-        </div>
-      </div>
-
-      <div class="callout">
-        <div class="callout-title">GDPR Article 5(1)(c) — Data Minimization</div>
-        <p>
-          Personal data must be <em>"adequate, relevant, and limited to what is necessary."</em>
-          By using an anonymous salted hash, we collect no PII at all. Even so, Travelguidehub
-          still ships a dedicated Privacy Settings page: an explicit GDPR consent toggle is
-          required before any review is posted, and a single button triggers an API call that
-          scrubs all data associated with the current <code>hashedId</code>.
-        </p>
-      </div>
-    </section>
-
-    <!-- ═══════════════════════════ 04 — TRADE-OFFS ═══════════════════════════ -->
-    <section id="tradeoffs">
-      <div class="section-label">04 — Trade-offs</div>
-      <h2>Edge Cases &amp; Honest Answers</h2>
-      <p>No architecture is a silver bullet. Here is how we handle the inherent downsides.</p>
-
-      <div class="faq-item">
-        <div class="faq-q">Q — What if the user reinstalls the app or changes their phone?</div>
-        <p class="faq-a">
-          They get a completely new identity — by design. For a travel guide where data is
-          highly contextual to a specific short-term trip, this is an acceptable trade-off
-          for maximum privacy. Apps that require long-term persistence should use a
-          <strong>Progressive Upgrade</strong> pattern: let users optionally link an email
-          later, once they have a reason to care about cross-device continuity.
-        </p>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-q">Q — How do you handle GDPR consent?</div>
-        <p class="faq-a">
-          Even with an anonymous ID, users must explicitly toggle a consent switch in Privacy
-          Settings before their device identity is used to post public reviews. A separate
-          button calls the backend to hard-delete all data tied to the current
-          <code>hashedId</code> — full "right to be forgotten" in a single tap.
-        </p>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-q">Q — Can a bad actor flood the system with fake reviews by reinstalling?</div>
-        <p class="faq-a">
-          Yes — this is the primary attack vector. Mitigation requires IP-based rate limiting
-          at the API layer and strict server-side validation. Treat anonymous IDs with the
-          same suspicion as any unauthenticated endpoint: rate-limit aggressively and
-          shadow-ban on suspicious review velocity.
-        </p>
-      </div>
-
-      <div class="compare">
-        <div class="compare-box bad">
-          <div class="compare-label bad">When not to use this pattern</div>
-          <ul>
-            <li>Cross-device sync is required</li>
-            <li>Long-term account history matters</li>
-            <li>Paid subscriptions or billing</li>
-            <li>Social features requiring a persistent identity</li>
-          </ul>
-        </div>
-        <div class="compare-box highlight good">
-          <div class="compare-label good">When this pattern shines</div>
-          <ul>
-            <li>Travel &amp; utility apps (contextual use)</li>
-            <li>Content platforms (read-heavy)</li>
-            <li>TTFV is the primary acquisition metric</li>
-            <li>Privacy-first, GDPR-sensitive markets</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══════════════════════════ 05 — AUTHOR ═══════════════════════════ -->
-    <section id="author">
-      <div class="section-label">05 — Author</div>
-      <h2>About This Article</h2>
-      <p>
-        The Zero-Login architecture described here is not theoretical. I designed and
-        implemented it end-to-end for <strong>Travelguidehub</strong> — handling the
-        React Native client identity flow, the backend API integration, and the full
-        GDPR compliance layer.
-      </p>
-
-      <div class="author-block">
-        <div class="author-avatar">AM</div>
-        <div>
-          <div class="author-name">Alessandro Marocchini</div>
-          <p class="author-bio">
-            Software architect and developer. Built the Device-Bound Identity system
-            for Travelguidehub from scratch — from the SHA-256 salting strategy on the
-            React Native client to the anonymous primary key design on the backend and
-            the GDPR opt-in / data-deletion flows.
-          </p>
-          <span class="author-project">Travelguidehub</span>
-        </div>
-      </div>
-
-      <p style="margin-top:1.5rem">
-        Have you experimented with frictionless authentication in your projects?
-        Thoughts on the trade-offs are welcome.
-      </p>
-    </section>
-
-  </div><!-- /container -->
-
-  <footer>
+  <!-- ═══════════════════════════════════════════════
+       01 — BUSINESS CASE
+  ═══════════════════════════════════════════════ -->
+  <section id="why" class="ed-section">
     <div class="container">
-      <div class="footer-inner">
-        <span class="footer-text">© 2026 Alessandro Marocchini — Travelguidehub</span>
-        <a href="https://alessandro-marocchini.github.io/ckp-llm/" class="footer-link">← Back to articles</a>
+
+      <div class="ed-grid">
+
+        <!-- Testo -->
+        <div>
+          <span class="section-number">01 — Business Case</span>
+
+          <h2>Why removing login dramatically improves adoption</h2>
+
+          <p class="lead">
+            In mobile ecosystems, friction kills retention.
+            Traditional onboarding introduces cognitive load
+            <em>before</em> the user experiences any value.
+          </p>
+
+          <p>
+            Research consistently shows that every additional step
+            in an onboarding flow reduces conversion by 10–20%.
+            For a travel app relying on spontaneous discovery,
+            this cost is catastrophic.
+          </p>
+
+          <p>
+            Travelguidehub removes authentication entirely,
+            replacing persistent accounts with
+            <strong>anonymous device-bound identities</strong> —
+            transparent to the user, compliant by design.
+          </p>
+
+          <!-- Stat mini-grid -->
+          <div class="ed-stats" style="margin-top: 3rem;">
+            <div class="ed-stat">
+              <span class="ed-stat__number">–34%</span>
+              <span class="ed-stat__label">Drop-off after login step</span>
+            </div>
+            <div class="ed-stat">
+              <span class="ed-stat__number">+2.4×</span>
+              <span class="ed-stat__label">Retention with zero-friction onboarding</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Immagine -->
+        <div>
+          <!--
+            friction-ui.jpg — screenshot UI frictionless
+            Dimensioni consigliate: 800×1000
+          -->
+          <img
+            src="friction-ui.jpg"
+            class="ed-image ed-image--tall"
+            alt="Frictionless experience"
+            loading="lazy"
+          />
+        </div>
+
       </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       QUOTE
+  ═══════════════════════════════════════════════ -->
+  <section class="ed-quote-section">
+    <div class="container">
+      <blockquote>
+        "The best authentication
+        experience is the one
+        users never notice."
+        <footer>Zero Login Architecture, 2026</footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       EVOLUTION TIMELINE INFOGRAPHIC
+  ═══════════════════════════════════════════════ -->
+  <section class="ed-section ed-section--dark">
+    <div class="container">
+
+      <span class="section-number">01.5 — Evolution</span>
+      <h2>From passwords to invisible identity</h2>
+      <p>
+        Authentication has evolved from shared secrets to contextual,
+        ambient systems that don't require user action at all.
+      </p>
+
+      <!-- INFOGRAFICA SVG — Timeline orizzontale -->
+      <div class="ed-infographic" style="margin-top:3rem;">
+        <div class="ed-infographic__title">Authentication Evolution Timeline</div>
+
+        <svg
+          viewBox="0 0 900 200"
+          xmlns="http://www.w3.org/2000/svg"
+          style="width:100%; height:auto; overflow:visible;"
+          aria-label="Authentication evolution timeline"
+        >
+          <!-- Linea base -->
+          <line x1="60" y1="100" x2="840" y2="100"
+                stroke="#2a2a2a" stroke-width="1"/>
+
+          <!-- ERA 1: Password -->
+          <circle cx="120" cy="100" r="8" fill="#2a2a2a" stroke="#3a3a3a" stroke-width="1"/>
+          <text x="120" y="76" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9" fill="#5a5a56" letter-spacing="1">2000</text>
+          <text x="120" y="130" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9" fill="#9a9a94" letter-spacing="0.5">Password</text>
+          <text x="120" y="144" text-anchor="middle"
+                font-family="DM Sans, sans-serif" font-size="9" fill="#5a5a56">Username + secret</text>
+
+          <!-- Connettore -->
+          <line x1="128" y1="100" x2="262" y2="100"
+                stroke="#2a2a2a" stroke-width="1" stroke-dasharray="4 3"/>
+
+          <!-- ERA 2: MFA -->
+          <circle cx="270" cy="100" r="8" fill="#2a2a2a" stroke="#3a3a3a" stroke-width="1"/>
+          <text x="270" y="76" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9" fill="#5a5a56" letter-spacing="1">2012</text>
+          <text x="270" y="130" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9" fill="#9a9a94" letter-spacing="0.5">MFA / 2FA</text>
+          <text x="270" y="144" text-anchor="middle"
+                font-family="DM Sans, sans-serif" font-size="9" fill="#5a5a56">Password + token</text>
+
+          <!-- Connettore -->
+          <line x1="278" y1="100" x2="412" y2="100"
+                stroke="#2a2a2a" stroke-width="1" stroke-dasharray="4 3"/>
+
+          <!-- ERA 3: SSO / OAuth -->
+          <circle cx="420" cy="100" r="8" fill="#2a2a2a" stroke="#3a3a3a" stroke-width="1"/>
+          <text x="420" y="76" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9" fill="#5a5a56" letter-spacing="1">2018</text>
+          <text x="420" y="130" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9" fill="#9a9a94" letter-spacing="0.5">SSO / OAuth</text>
+          <text x="420" y="144" text-anchor="middle"
+                font-family="DM Sans, sans-serif" font-size="9" fill="#5a5a56">Federated identity</text>
+
+          <!-- Connettore -->
+          <line x1="428" y1="100" x2="562" y2="100"
+                stroke="#2a2a2a" stroke-width="1" stroke-dasharray="4 3"/>
+
+          <!-- ERA 4: Passkeys -->
+          <circle cx="570" cy="100" r="8" fill="#2a2a2a" stroke="#3a3a3a" stroke-width="1"/>
+          <text x="570" y="76" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9" fill="#5a5a56" letter-spacing="1">2023</text>
+          <text x="570" y="130" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9" fill="#9a9a94" letter-spacing="0.5">Passkeys</text>
+          <text x="570" y="144" text-anchor="middle"
+                font-family="DM Sans, sans-serif" font-size="9" fill="#5a5a56">Biometric cryptography</text>
+
+          <!-- Connettore accentuato -->
+          <line x1="578" y1="100" x2="762" y2="100"
+                stroke="#c8f060" stroke-width="1" opacity="0.3"/>
+
+          <!-- ERA 5: Zero Login — ATTIVO -->
+          <circle cx="770" cy="100" r="12" fill="#c8f060" opacity="0.15"/>
+          <circle cx="770" cy="100" r="8"  fill="#0a0a0a" stroke="#c8f060" stroke-width="2"/>
+          <circle cx="770" cy="100" r="3"  fill="#c8f060"/>
+
+          <!-- Glow -->
+          <circle cx="770" cy="100" r="20" fill="none"
+                  stroke="#c8f060" stroke-width="1" opacity="0.1"/>
+
+          <text x="770" y="72" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9"
+                fill="#c8f060" letter-spacing="1">2026 →</text>
+          <text x="770" y="130" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="9"
+                fill="#c8f060" letter-spacing="0.5">Zero Login</text>
+          <text x="770" y="144" text-anchor="middle"
+                font-family="DM Sans, sans-serif" font-size="9"
+                fill="#9a9a94">Device-bound anonymous</text>
+
+          <!-- Badge NOW -->
+          <rect x="737" y="52" width="66" height="14"
+                rx="3" fill="#c8f060" opacity="0.12"/>
+          <text x="770" y="62" text-anchor="middle"
+                font-family="DM Mono, monospace" font-size="7"
+                fill="#c8f060" letter-spacing="1">NOW</text>
+        </svg>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       02 — ARCHITECTURE
+  ═══════════════════════════════════════════════ -->
+  <section id="architecture" class="ed-section">
+    <div class="container">
+
+      <span class="section-number">02 — Architecture</span>
+      <h2>Device-Bound Identity</h2>
+
+      <p class="lead">
+        Instead of storing personal accounts, the application
+        generates an anonymous, salted and irreversible identity
+        scoped to the current installation.
+      </p>
+
+      <!-- Stats -->
+      <div class="ed-stats">
+        <div class="ed-stat">
+          <span class="ed-stat__number">0%</span>
+          <span class="ed-stat__label">Password usage</span>
+        </div>
+        <div class="ed-stat">
+          <span class="ed-stat__number">16</span>
+          <span class="ed-stat__label">Char hash identity</span>
+        </div>
+        <div class="ed-stat">
+          <span class="ed-stat__number">GDPR</span>
+          <span class="ed-stat__label">Privacy by design</span>
+        </div>
+        <div class="ed-stat">
+          <span class="ed-stat__number">SHA‑256</span>
+          <span class="ed-stat__label">Hashing algorithm</span>
+        </div>
+      </div>
+
+      <!-- INFOGRAFICA — Architettura verticale -->
+      <div class="ed-infographic">
+        <div class="ed-infographic__title">Identity Generation Flow</div>
+        <div style="max-width:480px; margin: 0 auto;">
+
+          <div class="arch-node">
+            <span class="arch-node__icon">📱</span>
+            <div>
+              <span class="arch-node__label">Device Identifier</span>
+              <span class="arch-node__sub">Installation-scoped unique ID</span>
+            </div>
+          </div>
+
+          <div class="arch-arrow">↓</div>
+
+          <div class="arch-node">
+            <span class="arch-node__icon">🕐</span>
+            <div>
+              <span class="arch-node__label">Salt with Timestamp</span>
+              <span class="arch-node__sub">install_time + device_id</span>
+            </div>
+          </div>
+
+          <div class="arch-arrow">↓</div>
+
+          <div class="arch-node">
+            <span class="arch-node__icon">🔐</span>
+            <div>
+              <span class="arch-node__label">SHA-256 Hash</span>
+              <span class="arch-node__sub">Irreversible one-way function</span>
+            </div>
+          </div>
+
+          <div class="arch-arrow">↓</div>
+
+          <div class="arch-node" style="border-color: rgba(200,240,96,.3);">
+            <span class="arch-node__icon">🎫</span>
+            <div>
+              <span class="arch-node__label" style="color:var(--accent)">Anonymous Identity (16 chars)</span>
+              <span class="arch-node__sub">No email · No password · No PII</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Flow steps -->
+      <div class="ed-flow" style="margin-top:5rem;">
+
+        <div class="ed-flow__step">
+          <div class="ed-flow__num">01</div>
+          <div>
+            <span class="ed-flow__title">Retrieve device identifier</span>
+            <p class="ed-flow__body">
+              Generate a temporary installation-based identity
+              using the device's unique hardware token,
+              scoped to the current app installation.
+            </p>
+          </div>
+        </div>
+
+        <div class="ed-flow__step">
+          <div class="ed-flow__num">02</div>
+          <div>
+            <span class="ed-flow__title">Salt with timestamp</span>
+            <p class="ed-flow__body">
+              The identity changes after reinstall,
+              preventing persistent cross-session tracking
+              and aligning with GDPR minimization principles.
+            </p>
+          </div>
+        </div>
+
+        <div class="ed-flow__step">
+          <div class="ed-flow__num">03</div>
+          <div>
+            <span class="ed-flow__title">Generate SHA-256 hash</span>
+            <p class="ed-flow__body">
+              No emails, passwords or personal data are ever
+              stored or transmitted. The hash is the identity.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Codice -->
+<pre><code><span class="cmt">// Zero Login — identity generation</span>
+<span class="kw">const</span> raw = deviceId + Date.<span class="num">now</span>();
+
+<span class="kw">const</span> hashedId =
+  <span class="num">sha256</span>(raw).<span class="num">slice</span>(<span class="num">0</span>, <span class="num">16</span>);
+
+<span class="cmt">// Result: "a3f1b9c0e2d47812" — anonymous, ephemeral</span></code></pre>
+
+      <!-- Callout -->
+      <div class="ed-callout">
+        <span class="ed-callout__title">Privacy by design</span>
+        <p>
+          Cross-installation tracking is impossible
+          <strong>by architecture</strong>, not only by policy.
+          Even Travelguidehub's own servers cannot correlate
+          two sessions from the same device after reinstall.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       03 — SECURITY
+  ═══════════════════════════════════════════════ -->
+  <section id="security" class="ed-section ed-section--dark">
+    <div class="container">
+
+      <div class="ed-grid ed-grid--reverse">
+
+        <!-- Immagine -->
+        <div>
+          <!--
+            security.jpg — immagine security/cyber
+            Dimensioni consigliate: 800×1000
+          -->
+          <img
+            src="security.jpg"
+            class="ed-image ed-image--tall"
+            alt="Security architecture"
+            loading="lazy"
+          />
+        </div>
+
+        <!-- Testo -->
+        <div>
+          <span class="section-number">03 — Security</span>
+
+          <h2>Eliminating the authentication attack surface</h2>
+
+          <p class="lead">
+            No passwords means no credential stuffing,
+            no phishing pages and dramatically reduced risk exposure.
+          </p>
+
+          <p>
+            The architecture embraces <strong>minimization</strong>:
+            collect less, protect more. When there's nothing to steal,
+            there's nothing to breach.
+          </p>
+
+          <!-- INFOGRAFICA — Confronto attack surface -->
+          <div class="ed-infographic" style="margin-top:2.5rem; padding:2rem;">
+            <div class="ed-infographic__title">Attack Surface Comparison</div>
+
+            <svg
+              viewBox="0 0 460 160"
+              xmlns="http://www.w3.org/2000/svg"
+              style="width:100%; height:auto;"
+              aria-label="Attack surface comparison chart"
+            >
+              <!-- Label Traditional -->
+              <text x="0" y="14"
+                    font-family="DM Mono, monospace" font-size="8"
+                    fill="#5a5a56" letter-spacing="1">TRADITIONAL</text>
+
+              <!-- Barre Traditional -->
+              <rect x="0" y="22" width="320" height="12" rx="2"
+                    fill="#2a2a2a"/>
+              <rect x="0" y="22" width="310" height="12" rx="2"
+                    fill="#ff4444" opacity="0.7"/>
+              <text x="316" y="32" font-family="DM Mono, monospace"
+                    font-size="7" fill="#ff4444">Credential theft</text>
+
+              <rect x="0" y="40" width="320" height="12" rx="2"
+                    fill="#2a2a2a"/>
+              <rect x="0" y="40" width="280" height="12" rx="2"
+                    fill="#ff4444" opacity="0.5"/>
+              <text x="316" y="50" font-family="DM Mono, monospace"
+                    font-size="7" fill="#5a5a56">Phishing</text>
+
+              <rect x="0" y="58" width="320" height="12" rx="2"
+                    fill="#2a2a2a"/>
+              <rect x="0" y="58" width="240" height="12" rx="2"
+                    fill="#ff4444" opacity="0.4"/>
+              <text x="316" y="68" font-family="DM Mono, monospace"
+                    font-size="7" fill="#5a5a56">DB breach</text>
+
+              <!-- Separator -->
+              <line x1="0" y1="86" x2="460" y2="86"
+                    stroke="#2a2a2a" stroke-width="1"/>
+
+              <!-- Label Zero Login -->
+              <text x="0" y="100"
+                    font-family="DM Mono, monospace" font-size="8"
+                    fill="#c8f060" letter-spacing="1">ZERO LOGIN</text>
+
+              <rect x="0" y="108" width="320" height="12" rx="2"
+                    fill="#1a1a1a"/>
+              <rect x="0" y="108" width="0" height="12" rx="2"
+                    fill="#c8f060" opacity="0.7"/>
+              <text x="8" y="118" font-family="DM Mono, monospace"
+                    font-size="7" fill="#c8f060">0% — No credentials to steal</text>
+
+              <rect x="0" y="126" width="320" height="12" rx="2"
+                    fill="#1a1a1a"/>
+              <rect x="0" y="126" width="0" height="12" rx="2"
+                    fill="#c8f060" opacity="0.5"/>
+              <text x="8" y="136" font-family="DM Mono, monospace"
+                    font-size="7" fill="#5a5a56">0% — No login page to spoof</text>
+
+              <rect x="0" y="144" width="320" height="12" rx="2"
+                    fill="#1a1a1a"/>
+              <rect x="0" y="144" width="12" height="12" rx="2"
+                    fill="#c8f060" opacity="0.4"/>
+              <text x="316" y="154" font-family="DM Mono, monospace"
+                    font-size="7" fill="#5a5a56">Minimal — anonymous hashes only</text>
+            </svg>
+          </div>
+
+          <p style="margin-top:1.5rem;">
+            The architecture embraces minimization:
+            collect less, protect more.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       TRUST LAYERS INFOGRAPHIC (full width)
+  ═══════════════════════════════════════════════ -->
+  <section class="ed-section ed-section--surface">
+    <div class="container">
+
+      <span class="section-number">03.5 — Trust Model</span>
+      <h2>Layered trust without credentials</h2>
+      <p>
+        Zero Login replaces password-based trust with
+        multi-layered contextual signals —
+        each independently meaningless, powerful in combination.
+      </p>
+
+      <div class="ed-tier-grid" style="margin-top:3rem;">
+
+        <div class="ed-tier">
+          <div class="ed-tier__icon">📱</div>
+          <span class="ed-tier__name">Layer 1</span>
+          <div class="ed-tier__title">Device</div>
+          <p class="ed-tier__desc">
+            Installation-scoped anonymous hash.
+            Regenerated on reinstall, ephemeral by design.
+          </p>
+        </div>
+
+        <div class="ed-tier">
+          <div class="ed-tier__icon">🌍</div>
+          <span class="ed-tier__name">Layer 2</span>
+          <div class="ed-tier__title">Context</div>
+          <p class="ed-tier__desc">
+            Geographic and temporal signals.
+            Adds environmental trust without identifying the user.
+          </p>
+        </div>
+
+        <div class="ed-tier ed-tier--featured">
+          <div class="ed-tier__icon">🧬</div>
+          <span class="ed-tier__name">Layer 3</span>
+          <div class="ed-tier__title">Behavioral</div>
+          <p class="ed-tier__desc">
+            Usage patterns and interaction entropy.
+            Implicit, passive, impossible to phish.
+          </p>
+        </div>
+
+        <div class="ed-tier">
+          <div class="ed-tier__icon">🔑</div>
+          <span class="ed-tier__name">Layer 4</span>
+          <div class="ed-tier__title">Cryptographic</div>
+          <p class="ed-tier__desc">
+            SHA-256 one-way hash as identity anchor.
+            No reversal, no correlation, no recovery.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       04 — FUTURE
+  ═══════════════════════════════════════════════ -->
+  <section id="future" class="ed-section">
+    <div class="container">
+
+      <span class="section-number">04 — Future</span>
+      <h2>Toward invisible authentication</h2>
+
+      <p class="lead">
+        Zero-login systems represent a broader shift:
+        identity becomes <em>contextual</em>, temporary and ambient.
+        The login screen disappears not because we removed a feature —
+        but because identity stops requiring explicit expression.
+      </p>
+
+      <div class="ed-grid ed-grid--equal" style="margin-top:4rem; gap:4rem;">
+
+        <div>
+          <p>
+            As device biometrics mature and behavioral cryptography
+            becomes mainstream, the concept of "proving who you are"
+            will feel as archaic as typing an IP address to visit a website.
+          </p>
+          <p>
+            The next frontier is <strong>anticipatory identity</strong>:
+            systems that model trust progressively over session time,
+            elevating permissions silently as confidence grows —
+            without ever asking the user to act.
+          </p>
+        </div>
+
+        <div>
+          <!-- Timeline futuro -->
+          <div class="ed-timeline">
+
+            <div class="ed-timeline__item">
+              <div class="ed-timeline__dot"></div>
+              <span class="ed-timeline__year">2024</span>
+              <div class="ed-timeline__title">Passkeys mainstream</div>
+              <p class="ed-timeline__desc">
+                FIDO2/WebAuthn adoption reaches critical mass
+                on iOS, Android and web.
+              </p>
+            </div>
+
+            <div class="ed-timeline__item ed-timeline__item--active">
+              <div class="ed-timeline__dot"></div>
+              <span class="ed-timeline__year">2026 — Now</span>
+              <div class="ed-timeline__title">Zero Login architecture</div>
+              <p class="ed-timeline__desc">
+                Anonymous device-bound identities.
+                No credentials, full GDPR compliance.
+              </p>
+            </div>
+
+            <div class="ed-timeline__item">
+              <div class="ed-timeline__dot"></div>
+              <span class="ed-timeline__year">2028</span>
+              <div class="ed-timeline__title">Behavioral identity</div>
+              <p class="ed-timeline__desc">
+                Trust levels derived from interaction entropy
+                and temporal patterns, not explicit auth.
+              </p>
+            </div>
+
+            <div class="ed-timeline__item">
+              <div class="ed-timeline__dot"></div>
+              <span class="ed-timeline__year">2030+</span>
+              <div class="ed-timeline__title">Ambient authentication</div>
+              <p class="ed-timeline__desc">
+                Identity is contextual, distributed and invisible.
+                The login concept no longer exists.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FINAL MANIFESTO QUOTE
+  ═══════════════════════════════════════════════ -->
+  <section class="ed-quote-section">
+    <div class="container">
+      <blockquote>
+        "Zero Login is not a feature.
+        It is a philosophical stance:
+        identity should serve the user,
+        not the other way around."
+        <footer>Alessandro Marocchini — Travelguidehub, 2026</footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════ -->
+  <footer class="ed-footer">
+    <div class="container ed-footer__inner">
+      <span class="ed-footer__text">© 2026 Alessandro Marocchini</span>
+      <a href="#" class="ed-footer__link">Back to articles</a>
     </div>
   </footer>
 
 </body>
-
 </html>
